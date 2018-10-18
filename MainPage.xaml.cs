@@ -142,7 +142,7 @@ namespace GettingStarted_Ink
                 }
             }
         }
-        //Draws Elipses /Circles
+        //Draws Elipses /Circles based on user drawing
         private void DrawEllipse(InkAnalysisInkDrawing shape) {
             var points = shape.Points;
             Ellipse ellipse = new Ellipse();
@@ -266,5 +266,43 @@ namespace GettingStarted_Ink
             }
         }
         // End "Step 7: Save and load ink"
+
+
+        //draw shapes on release, needs to be tested on a non jank monitor or with a touch screen, pointer released doesn't always work as per MS
+        private async void inkCanvas_PointerReleased(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e) {
+            strokesShape = inkCanvas.InkPresenter.StrokeContainer.GetStrokes();
+
+            if (strokesShape.Count > 0) {
+                analyzerShape.AddDataForStrokes(strokesShape);
+
+                resultShape = await analyzerShape.AnalyzeAsync();
+
+                if (resultShape.Status == InkAnalysisStatus.Updated) {
+                    var drawings = analyzerShape.AnalysisRoot.FindNodes(InkAnalysisNodeKind.InkDrawing);
+
+                    foreach (var drawing in drawings) {
+                        var shape = (InkAnalysisInkDrawing)drawing;
+                        if (shape.DrawingKind == InkAnalysisDrawingKind.Drawing) {
+                            // Catch and process unsupported shapes (lines and so on) here.
+                        }
+                        else {
+                            // Process recognized shapes here.
+                            if (shape.DrawingKind == InkAnalysisDrawingKind.Circle || shape.DrawingKind == InkAnalysisDrawingKind.Ellipse) {
+                                DrawEllipse(shape);
+                            }
+                            else {
+                                DrawPolygon(shape);
+                            }
+                            foreach (var strokeId in shape.GetStrokeIds()) {
+                                var stroke = inkCanvas.InkPresenter.StrokeContainer.GetStrokeById(strokeId);
+                                stroke.Selected = true;
+                            }
+                        }
+                        analyzerShape.RemoveDataForStrokes(shape.GetStrokeIds());
+                    }
+                    inkCanvas.InkPresenter.StrokeContainer.DeleteSelected();
+                }
+            }
+        }
     }
 }
