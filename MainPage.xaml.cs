@@ -64,10 +64,10 @@ namespace GettingStarted_Ink
             this.InitializeComponent();
 
             // Begin "Step 3: Support inking with touch and mouse"
-            //inkCanvas.InkPresenter.InputDeviceTypes =
-            //    Windows.UI.Core.CoreInputDeviceTypes.Mouse |
-            //    Windows.UI.Core.CoreInputDeviceTypes.Touch |
-            //    Windows.UI.Core.CoreInputDeviceTypes.Pen;
+            inkCanvas.InkPresenter.InputDeviceTypes =
+                Windows.UI.Core.CoreInputDeviceTypes.Mouse |//allow mouse yo
+                Windows.UI.Core.CoreInputDeviceTypes.Touch |//this comment says touch
+                Windows.UI.Core.CoreInputDeviceTypes.Pen;   //this is a pen
             // End "Step 3: Support inking with touch and mouse"
 
         }
